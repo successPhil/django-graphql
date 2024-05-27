@@ -1,22 +1,73 @@
-# Intro to GraphQL
+# GraphQL Queries and Mutations
 
-This README will contain information and references about graphQL:
+Lets take a look at our schema:
 
-- What is graphQL
-    - graph, schema, typeDefs, Resolvers, Mutations
-    - What is the difference between REST and graphQL
-    - What are the pros and cons of graphQL
-    - Links to documentation for graphQL
+<details>
+<summary>Click to view schema.py</summary>
 
-# Creating a Movie application that uses graphQL
+```
+import graphene
+from graphene_django import DjangoObjectType
+from random import choice
 
-The code in this repo should be complete and working. This should allow you to clone down the repo, and run the application.
-
-However, for learning purposes, you will probably gain the most from going through the steps to implement a graphQL API in Django, and consume it in React.
+from movies.models import Movies
 
 
+class MoviesType(DjangoObjectType):
+    class Meta:
+        model = Movies
+        fields = '__all__'
 
-The `backend/` and `frontend/` directories each have a README with instructions on how to set up graphQL for the respective project.
+class Query(graphene.ObjectType):
+    all_movies = graphene.List(MoviesType)
+    movie_by_id = graphene.Field(MoviesType, id=graphene.Int(required=True))
+    random_movie = graphene.Field(MoviesType)
+    
+    def resolve_all_movies(root, info):
+        return Movies.objects.all()
+    
+    def resolve_movie_by_id(root, info, id):
+        try:
+            return Movies.objects.get(pk=id)
+        except Movies.DoesNotExist:
+            return None
+    
+    def resolve_random_movie(root, info):
+        all_movies = list(Movies.objects.all())
+        if all_movies:
+            return choice(all_movies)
+        return None
+    
+class CreateMovie(graphene.Mutation):
+    movie = graphene.Field(MoviesType)
 
-If you are able to go through all of the steps and successfully get your application working, then you likely can implement a graphQL of your own, in a different project, with your own data.
+    class Arguments:
+        Title = graphene.String(required=True)
+        Year = graphene.Int(required=True)
+        Rank = graphene.Int(required=True)
+        Length = graphene.String(required=True)
+        Rating = graphene.String(required=True)
+
+    def mutate(self, info, Title, Year, Rank, Length, Rating):
+        movie = Movies(Title=Title, Year=Year, Rank=Rank, Length=Length, Rating=Rating)
+        movie.save()
+        return CreateMovie(movie=movie)
+
+class Mutation(graphene.ObjectType):
+    create_movie = CreateMovie.Field()
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
+
+```
+
+### Schema
+Remember that a Schema in GraphQL is a contract between the client and the server.
+
+It defines the `types` of data that can be queried and the operations that can be performed (`mutations`)
+
+The schema specifies the data and relationshis between different `types`.
+
+* Acts as a blueprint for API *
+
+</details>
 

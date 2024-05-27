@@ -4,6 +4,7 @@ import App from './App.jsx'
 import './index.css'
 
 import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
+import { MovieProvider } from './context/MovieContext';
 
 // const base_url = `https://${import.meta.env.VITE_BASE_URL}/movies/`
 
@@ -17,8 +18,10 @@ const client = new ApolloClient({
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ApolloProvider client={client}>
+    <MovieProvider>
   <React.StrictMode>
     <App />
   </React.StrictMode>
+  </MovieProvider>
   </ApolloProvider>,
 )

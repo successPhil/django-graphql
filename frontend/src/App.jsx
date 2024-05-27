@@ -1,27 +1,29 @@
-import { useQuery } from '@apollo/client';
-import { GET_MOVIES } from './api/queries';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import MovieList from './pages/MovieList';
+import CreateMovie from './pages/CreateMovie';
+import GetMovie from './pages/GetMovie';
+import GetRandomMovie from './pages/GetRandomMovie';
+
 function App() {
-  const { loading, error, data } = useQuery(GET_MOVIES);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error : {error.message}</p>;
-
   return (
-    <>
-    <h1>Movie List</h1>
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {data.allMovies.map((movie) => (
-          <div key={movie.id} style={{ border: '1px solid #ccc', margin: '10px', padding: '10px', width: '200px', backgroundColor: '#6E7DAB' }}>
-            <h2>{movie.Title}</h2>
-            <p>Rank: {movie.Rank}</p>
-            <p>Year: {movie.Year}</p>
-            <p>Length: {movie.Length}</p>
-            <p>Rating: {movie.Rating}</p>
-          </div>
-        ))}
-        </div>
-    </>
-  )
+    <Router>
+      <nav>
+        <ul>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/create">Create Movie</Link></li>
+          <li><Link to="/get-movie">Get Movie</Link></li>
+          <li><Link to="/random-movie">Get Random Movie</Link></li>
+        </ul>
+      </nav>
+      <Routes>
+        <Route path="/" element={<MovieList />} />
+        <Route path="/create" element={<CreateMovie />} />
+        <Route path="/get-movie" element={<GetMovie />} />
+        <Route path="/random-movie" element={<GetRandomMovie />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
