@@ -16,14 +16,17 @@ We need to:
 11. Add fixtures/movies.json to movies app
 12. Make Migrations
 13. Load Fixture
+14. Add middleware
 
 
-Installing django and graphene
+- Installing django and graphene
+
 ```
 pip install graphene-django
 ```
 
-Installing psycopg
+- Installing psycopg
+
 ```
 pip install "psycopg[binary]"
 ```
@@ -32,12 +35,13 @@ pip install "psycopg[binary]"
 
 
 
-Creating Django Project
+- Creating Django Project
+
 ```
 python -m django startproject movies_project .
 ```
 
-Creating movies app
+- Creating movies app
 
 ```
 python manage.py startapp movies
@@ -45,9 +49,10 @@ python manage.py startapp movies
 
 
 
+
 You do not need to necessarily use Docker, but if you insist on not using it, you need to make sure that you have a postgres database locally that you can run.
 
-Here is a example `docker-compose.yml` that you can use to create a postgres DB in a container
+- Here is a example `docker-compose.yml` that you can use to create a postgres DB in a container:
 
 ```
 version: '3'
@@ -70,7 +75,7 @@ If you run `docker ps` and see that you have a postgres image running with port 
 
 
 
-Now go to your django settings, we need to update our `INSTALLED_APPS` and `DATABASES`:
+- Now go to your django settings, we need to update our `INSTALLED_APPS` and `DATABASES`:
 
 ```
 DATABASES = {
@@ -93,7 +98,7 @@ For installed apps, we need to add `graphene_django` and `movies` to our install
 
 
 
-You will want to migrate after you create the models you wish to use, in our case the Movies model:
+- You will want to migrate after you create the models you wish to use, in our case the Movies model:
 
 ```
 from django.db import models
@@ -201,6 +206,29 @@ If you have set everything up properly, you should be able to verify by running 
 
 Try using the query we built and verify you can modify the fields you would like to get back in the data easily.
 
+
+- Add `middleware.py` to `movies_project`:
+
+```
+class CorsMiddleware:
+	def __init__(self, get_response):
+		self.get_response = get_response
+
+	def __call__(self, request):
+		response = self.get_response(request)
+		response['Access-Control-Allow-Origin'] = "*"
+		response['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+		response["Access-Control-Allow-Methods"] = "DELETE, POST, GET, PUT, OPTIONS"
+		if request.method == "OPTIONS":
+			response.status_code = 200
+		return response
+```
+
+- Add `movies_project.middleware.CorsMiddleware` to your MIDDLEWARE in `settings.py`:
+
+```
+  'movies_project.middleware.CorsMiddleware',
+```
 
 
 # Checkpoint 1
