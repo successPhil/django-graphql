@@ -38,14 +38,37 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'graphene_django',
-    'movies'
+    'movies',
+    'users',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
 ]
 
 GRAPHENE = {
     'SCHEMA': 'movies_project.schema.schema'
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+DJOSER = {
+    'USER_ID_FIELD': 'username',
+}
+
+
 MIDDLEWARE = [
+    'movies_project.middleware.JWTAuthMiddleware',
     'movies_project.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
