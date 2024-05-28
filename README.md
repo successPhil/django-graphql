@@ -150,3 +150,14 @@ type Movie {
   year: Int!
   rating: String!
 }
+```
+
+
+# Additional Resources:
+
+While putting together these demos I visited several resources for learning and experimenting with implementing GraphQL with Django and React.
+
+Below is a list of resources that I felt helped me put this material together faster:
+
+- [Caleb Curry Django/ React GraphQL Tutorial](https://www.youtube.com/watch?v=zzUcL7sOQEM) - Part of a series, several videos, I watched 63/64
+- [Laith Academy Modern GraphQL Crash Course Tutorial](https://www.youtube.com/watch?v=qux4-yWeZvo) - Long in-depth tutorial, 3+ hours
