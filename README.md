@@ -72,30 +72,72 @@ GraphQL was created by Meta (formerly Facebook) to address problems they faced w
 You can think of some familiar features from Facebook (e.g., Likes). GraphQL's main purpose is to navigate a relational network (to query a relational graph).
 
 ## Key Concepts
+GraphQL Basics: Explain that GraphQL is a query language for APIs that allows clients to request exactly the data they need.
 
-### Schema-First Approach
-- **Designing the Schema**: Determine how to build the schema based on the needs of the client.
+Comparison with REST: Highlight differences such as fetching multiple resources in a single request, reduced over-fetching/under-fetching, and more structured queries.
 
-### Graphs, Nodes, and Edges
-- **Graph**: A collection of nodes (entities) and edges (relationships between entities). In GraphQL, the entire schema can be seen as a graph, representing how different entities relate to each other.
-- **Nodes**: Individual entities or objects in the graph (e.g., a `Movie` or a `User`).
-- **Edges**: The connections or relationships between nodes (e.g., a `User` who likes a `Movie`).
+## Understanding the Schema
 
-### Queries and Mutations
+Your schema will primarily consist of TypeDefs, Resolvers, and Query and Mutation Types.
+
+- **Type Definitions (TypeDefs)**
+Purpose: TypeDefs define the structure of your data and the types of operations (queries/mutations) that can be performed.
+Description: They describe what the data looks like, including the types and fields available in your API.
+
+
+Note this is a example of what a TypeDef can look like, with graphene and django we will not write TypeDefs
+
+Graphene and Django handle creating our necessary TypeDefs based off the models we define in our `schema.py`
+```
+type Pokemon {
+        id: Int!
+        name: String!
+        types: String!
+        front_default: String!
+        back_default: String!
+        front_shiny: String!
+        back_shiny: String!
+    }
+```
+
+- **Resolvers**
+Purpose: Resolvers provide the logic to fetch the data for the queries and mutations defined in the TypeDefs.
+Description: Resolvers are functions that handle the operations specified in the TypeDefs. They resolve the data by fetching it from a database, an external API, or other sources.
+<details>
+<summary>See Example</summary>
+
+```
+import graphene
+from graphene_django import DjangoObjectType
+
+from movies.models import Movies
+
+class MoviesType(DjangoObjectType):
+    class Meta:
+        model = Movies
+        fields = '__all__'
+
+class Query(graphene.ObjectType):
+    all_movies = graphene.List(MoviesType)
+    
+    def resolve_all_movies(root, info):
+        return Movies.objects.all()
+    
+
+schema = graphene.Schema(query=Query)
+
+```
+
+Our resolver is defined as a method in our root Query class. We can use resolvers to perform operations on the data that is queried
+
+*Note* `all_movies` defines our Query which returns a List of MoviesType
+The resolver defined as a method MUST be named `resolve_all_movies`
+
+</details>
+
 - **Query (Read)**: A request to fetch data. It is analogous to a GET request in REST.
 - **Mutation (Write)**: A request to modify data. It is analogous to POST, PUT, DELETE requests in REST.
 
-GraphQL is used to traverse these graphs, nodes, and edges. It allows clients to specify the shape of the data they want, which is particularly useful for mobile users where the amount of data sent in a request costs `time` and `bandwidth`.
-
-### Scalar Types in GraphQL
-GraphQL has five built-in scalar types:
-- **String**
-- **Boolean**
-- **Int**
-- **Float**
-- **ID**
-
-You can use `!` to mark a field as required, or place it in brackets `[]` to denote a list of that type.
 
 ### GraphQL vs. REST
 [A blog about REST vs GraphQL](https://www.cosmicjs.com/blog/graphql-vs-rest-a-quick-guide)
